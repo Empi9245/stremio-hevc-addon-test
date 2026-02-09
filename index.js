@@ -6,24 +6,16 @@ const CATALOG = [
     id: 'tt0057569',
     type: 'movie',
     name: 'The Strangler',
-    poster: 'https://image.tmdb.org/t/p/w500/aQvJ5WPzZgYVDrxLX4R6cLJCEaQ.jpg',
-    posterShape: 'poster',
-    background: 'https://image.tmdb.org/t/p/original/aQvJ5WPzZgYVDrxLX4R6cLJCEaQ.jpg',
     description: 'Film di test HEVC per TV Hisense',
     releaseInfo: '1964',
-    imdbRating: '6.7',
     genres: ['Thriller', 'Test HEVC']
   },
   {
     id: 'tt0032599',
     type: 'movie',
     name: 'His Girl Friday',
-    poster: 'https://image.tmdb.org/t/p/w500/1jEqMdHKpGwujiTWVw6OwrZzzRi.jpg',
-    posterShape: 'poster',
-    background: 'https://image.tmdb.org/t/p/original/1jEqMdHKpGwujiTWVw6OwrZzzRi.jpg',
     description: 'Film di test HEVC per TV Hisense',
     releaseInfo: '1940',
-    imdbRating: '7.9',
     genres: ['Comedy', 'Test HEVC']
   }
 ];
@@ -55,36 +47,41 @@ const builder = new addonBuilder(manifest);
 
 // Catalog handler
 builder.defineCatalogHandler(({ type, id }) => {
-  console.log('Catalog request:', type, id);
+  console.log('📚 Catalog request:', type, id);
   
   if (type === 'movie' && id === 'hevc_test_catalog') {
+    console.log(`✅ Returning ${CATALOG.length} movies`);
     return Promise.resolve({ metas: CATALOG });
   }
   
+  console.log('❌ Catalog not found');
   return Promise.resolve({ metas: [] });
 });
 
 // Meta handler
 builder.defineMetaHandler(({ type, id }) => {
-  console.log('Meta request:', type, id);
+  console.log('📋 Meta request:', type, id);
   
   if (type === 'movie') {
     const meta = CATALOG.find(m => m.id === id);
     if (meta) {
+      console.log(`✅ Found meta for ${id}`);
       return Promise.resolve({ meta });
     }
   }
   
+  console.log(`❌ Meta not found for ${id}`);
   return Promise.resolve({ meta: null });
 });
 
 // Stream handler
 builder.defineStreamHandler(({ type, id }) => {
-  console.log('Stream request:', type, id);
+  console.log('🎬 Stream request:', type, id);
   
   if (type === 'movie') {
     const url = STREAMS[id];
     if (url) {
+      console.log(`✅ Found stream for ${id}: ${url}`);
       return Promise.resolve({
         streams: [
           {
@@ -97,6 +94,7 @@ builder.defineStreamHandler(({ type, id }) => {
     }
   }
   
+  console.log(`❌ Stream not found for ${id}`);
   return Promise.resolve({ streams: [] });
 });
 
@@ -104,4 +102,17 @@ builder.defineStreamHandler(({ type, id }) => {
 const PORT = process.env.PORT || 7000;
 serveHTTP(builder.getInterface(), { port: PORT });
 
-console.log(`Addon running at http://127.0.0.1:${PORT}/manifest.json`);
+console.log(`\n✅ Addon running at http://127.0.0.1:${PORT}/manifest.json`);
+console.log(`\n📋 Test URLs:`);
+console.log(`   Manifest: http://127.0.0.1:${PORT}/manifest.json`);
+console.log(`   Catalog:  http://127.0.0.1:${PORT}/catalog/movie/hevc_test_catalog.json`);
+console.log(`   Meta:     http://127.0.0.1:${PORT}/meta/movie/tt0057569.json`);
+console.log(`   Stream:   http://127.0.0.1:${PORT}/stream/movie/tt0057569.json`);
+console.log(`\n🎬 Film disponibili:`);
+console.log(`   - The Strangler (1964) - ID: tt0057569`);
+console.log(`   - His Girl Friday (1940) - ID: tt0032599`);
+console.log(`\n💡 IMPORTANTE:`);
+console.log(`   1. DISINSTALLA l'addon vecchio da Stremio`);
+console.log(`   2. REINSTALLA usando: http://127.0.0.1:${PORT}/manifest.json`);
+console.log(`   3. Vai su Board → Cerca "HEVC Test Movies"`);
+console.log(`   4. Oppure cerca "The Strangler" nella ricerca\n`);
