@@ -1,0 +1,25 @@
+{
+  "name": "test-hevc-hisense-addon",
+  "version": "1.0.0",
+  "description": "Addon di test per riproduzione file HEVC (H.265) lunghi su TV Hisense / Vidaa / Home OS tramite Stremio",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "stremio",
+    "addon",
+    "hevc",
+    "h265",
+    "hisense",
+    "vidaa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "stremio-addon-sdk": "^1.6.10"
+  }
+}
