@@ -1,33 +1,28 @@
 const { addonBuilder } = require('stremio-addon-sdk');
 
-// Configurazione URL HEVC - Modificare questi valori per cambiare i file di test
+// Configurazione URL HEVC - Film di test con ID IMDB reali
+// The Strangler (1964) - IMDB: tt0057569
+// His Girl Friday (1940) - IMDB: tt0032599
 const HEVC_TEST_URLS = {
-  'test-hevc-strangler': 'https://archive.org/download/The_Strangler_1963/The_Strangler_1963.mkv',
-  'test-hevc-man-of-conflict': 'https://archive.org/download/Man_of_Conflict_1953/Man_of_Conflict_1953_512kb.mp4'
+  'tt0057569': 'https://archive.org/download/The_Strangler_1963/The_Strangler_1963.mkv',
+  'tt0032599': 'https://archive.org/download/His_Girl_Friday_1940/His_Girl_Friday_1940_512kb.mp4'
 };
 
 // Definizione del manifest
 const manifest = {
   id: 'test-hevc-hisense',
-  version: '1.0.1',
+  version: '1.0.3',
   name: 'Test HEVC Hisense',
   description: 'Addon di test per riproduzione file HEVC (H.265) lunghi su TV Hisense / Vidaa / Home OS tramite Stremio.',
-  resources: ['catalog', 'meta', 'stream'],
+  resources: ['catalog', 'stream'],
   types: ['movie'],
   catalogs: [
     {
       type: 'movie',
-      id: 'test-hevc-catalog',
-      name: 'Test HEVC Movies',
-      extra: [
-        {
-          name: 'skip',
-          isRequired: false
-        }
-      ]
+      id: 'hevc-test-catalog',
+      name: 'HEVC Test Movies'
     }
-  ],
-  idPrefixes: ['test-hevc-']
+  ]
 };
 
 // Creazione dell'addon builder
@@ -35,96 +30,33 @@ const builder = new addonBuilder(manifest);
 
 // Handler per il catalogo
 builder.defineCatalogHandler((args) => {
-  console.log('Catalog request:', JSON.stringify(args));
+  console.log('📚 Catalog request:', JSON.stringify(args));
   
   const { type, id } = args;
   
-  if (type !== 'movie') {
-    console.log('Type not movie, returning empty');
-    return Promise.resolve({ metas: [] });
-  }
-  
-  if (id !== 'test-hevc-catalog') {
-    console.log('Catalog ID not matching, returning empty');
+  if (type !== 'movie' || id !== 'hevc-test-catalog') {
+    console.log('❌ Catalog not matching');
     return Promise.resolve({ metas: [] });
   }
 
+  // Usa ID IMDB reali - Stremio prenderà automaticamente poster e info da TMDB
   const metas = [
     {
-      id: 'test-hevc-strangler',
+      id: 'tt0057569',
       type: 'movie',
-      name: 'Test HEVC – The Strangler (1963)',
-      poster: 'https://via.placeholder.com/300x450/0080FF/FFFFFF?text=HEVC+Test+1',
-      posterShape: 'poster',
-      background: 'https://via.placeholder.com/1280x720/0080FF/FFFFFF?text=HEVC+Test+1',
-      description: 'File di test HEVC per validazione riproduzione su TV Hisense - The Strangler (1963)',
-      releaseInfo: '1963',
-      genres: ['Test', 'HEVC']
+      name: 'The Strangler',
+      releaseInfo: '1964'
     },
     {
-      id: 'test-hevc-man-of-conflict',
+      id: 'tt0032599',
       type: 'movie',
-      name: 'Test HEVC – Man of Conflict (1953)',
-      poster: 'https://via.placeholder.com/300x450/FF8000/FFFFFF?text=HEVC+Test+2',
-      posterShape: 'poster',
-      background: 'https://via.placeholder.com/1280x720/FF8000/FFFFFF?text=HEVC+Test+2',
-      description: 'File di test HEVC per validazione riproduzione su TV Hisense - Man of Conflict (1953)',
-      releaseInfo: '1953',
-      genres: ['Test', 'HEVC']
+      name: 'His Girl Friday',
+      releaseInfo: '1940'
     }
   ];
 
-  console.log(`Returning ${metas.length} metas`);
+  console.log(`✅ Returning ${metas.length} movies in catalog`);
   return Promise.resolve({ metas });
-});
-
-// Handler per i meta (dettagli film)
-builder.defineMetaHandler((args) => {
-  console.log('📋 Meta request received:', JSON.stringify(args));
-  
-  const { type, id } = args;
-  
-  if (type !== 'movie') {
-    console.log('❌ Type not movie');
-    return Promise.resolve({ meta: null });
-  }
-  
-  const metaData = {
-    'test-hevc-strangler': {
-      id: 'test-hevc-strangler',
-      type: 'movie',
-      name: 'Test HEVC – The Strangler (1963)',
-      poster: 'https://via.placeholder.com/300x450/0080FF/FFFFFF?text=HEVC+Test+1',
-      posterShape: 'poster',
-      background: 'https://via.placeholder.com/1280x720/0080FF/FFFFFF?text=HEVC+Test+1',
-      description: 'File di test HEVC per validazione riproduzione su TV Hisense - The Strangler (1963)',
-      releaseInfo: '1963',
-      genres: ['Test', 'HEVC'],
-      runtime: '89 min'
-    },
-    'test-hevc-man-of-conflict': {
-      id: 'test-hevc-man-of-conflict',
-      type: 'movie',
-      name: 'Test HEVC – Man of Conflict (1953)',
-      poster: 'https://via.placeholder.com/300x450/FF8000/FFFFFF?text=HEVC+Test+2',
-      posterShape: 'poster',
-      background: 'https://via.placeholder.com/1280x720/FF8000/FFFFFF?text=HEVC+Test+2',
-      description: 'File di test HEVC per validazione riproduzione su TV Hisense - Man of Conflict (1953)',
-      releaseInfo: '1953',
-      genres: ['Test', 'HEVC'],
-      runtime: '72 min'
-    }
-  };
-  
-  const meta = metaData[id];
-  
-  if (meta) {
-    console.log(`✅ Found meta for ${id}`);
-    return Promise.resolve({ meta });
-  }
-  
-  console.log(`❌ No meta found for ${id}`);
-  return Promise.resolve({ meta: null });
 });
 
 // Handler per gli stream
@@ -147,10 +79,12 @@ builder.defineStreamHandler((args) => {
     console.log(`✅ Found stream for ${id}: ${url}`);
     const streams = [
       {
+        name: 'Test HEVC Hisense',
+        title: 'HEVC Test Stream',
         url,
-        title: `HEVC Test – ${id}`,
         behaviorHints: {
-          notWebReady: true
+          notWebReady: true,
+          bingeGroup: 'test-hevc-hisense'
         }
       }
     ];
@@ -169,5 +103,13 @@ const { serveHTTP } = require('stremio-addon-sdk');
 serveHTTP(builder.getInterface(), { port: PORT });
 
 console.log(`✅ Addon disponibile su: http://localhost:${PORT}/manifest.json`);
-console.log(`📺 Catalogo: http://localhost:${PORT}/catalog/movie/test-hevc-catalog.json`);
+console.log(`📺 Catalogo: http://localhost:${PORT}/catalog/movie/hevc-test-catalog.json`);
 console.log(`🎬 Manifest ID: ${manifest.id}`);
+console.log(`\n📝 Film disponibili:`);
+console.log(`   - The Strangler (1964) - IMDB: tt0057569`);
+console.log(`   - His Girl Friday (1940) - IMDB: tt0032599`);
+console.log(`\n💡 Come usare:`);
+console.log(`   1. Installa l'addon su Stremio`);
+console.log(`   2. Vai su Board → Vedrai "HEVC Test Movies" con i 2 film`);
+console.log(`   3. Oppure cerca i film nella ricerca di Stremio`);
+console.log(`   4. Clicca Watch → Vedrai lo stream "Test HEVC Hisense"`);
