@@ -34,8 +34,18 @@ const manifest = {
 const builder = new addonBuilder(manifest);
 
 // Handler per il catalogo
-builder.defineCatalogHandler(({ type, id }) => {
-  if (type !== 'movie' || id !== 'test-hevc-catalog') {
+builder.defineCatalogHandler((args) => {
+  console.log('Catalog request:', JSON.stringify(args));
+  
+  const { type, id } = args;
+  
+  if (type !== 'movie') {
+    console.log('Type not movie, returning empty');
+    return Promise.resolve({ metas: [] });
+  }
+  
+  if (id !== 'test-hevc-catalog') {
+    console.log('Catalog ID not matching, returning empty');
     return Promise.resolve({ metas: [] });
   }
 
@@ -64,18 +74,25 @@ builder.defineCatalogHandler(({ type, id }) => {
     }
   ];
 
+  console.log(`Returning ${metas.length} metas`);
   return Promise.resolve({ metas });
 });
 
 // Handler per gli stream
-builder.defineStreamHandler(({ type, id }) => {
+builder.defineStreamHandler((args) => {
+  console.log('Stream request:', JSON.stringify(args));
+  
+  const { type, id } = args;
+  
   if (type !== 'movie') {
+    console.log('Type not movie, returning empty streams');
     return Promise.resolve({ streams: [] });
   }
 
   const url = HEVC_TEST_URLS[id];
 
   if (url) {
+    console.log(`Found stream for ${id}: ${url}`);
     const streams = [
       {
         url,
@@ -88,6 +105,7 @@ builder.defineStreamHandler(({ type, id }) => {
     return Promise.resolve({ streams });
   }
 
+  console.log(`No stream found for ${id}`);
   return Promise.resolve({ streams: [] });
 });
 
@@ -97,4 +115,6 @@ const PORT = process.env.PORT || 7000;
 const { serveHTTP } = require('stremio-addon-sdk');
 serveHTTP(builder.getInterface(), { port: PORT });
 
-console.log(`Addon disponibile su: http://localhost:${PORT}/manifest.json`);
+console.log(`✅ Addon disponibile su: http://localhost:${PORT}/manifest.json`);
+console.log(`📺 Catalogo: http://localhost:${PORT}/catalog/movie/test-hevc-catalog.json`);
+console.log(`🎬 Manifest ID: ${manifest.id}`);
