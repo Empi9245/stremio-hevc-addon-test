@@ -33,6 +33,14 @@ const CATALOG = [
     description: 'Blender 4K HEVC Test - 24fps 9500kbps',
     releaseInfo: '2012',
     genres: ['Short', 'Test HEVC 4K']
+  },
+  {
+    id: 'tt4677012',
+    type: 'movie',
+    name: 'Journey to Space',
+    description: 'NASA ISS Fisheye 4K Ultra HD - Test HEVC',
+    releaseInfo: '2015',
+    genres: ['Documentary', 'Test HEVC 4K']
   }
 ];
 
@@ -41,7 +49,8 @@ const STREAMS = {
   'tt0057569': 'https://archive.org/download/The_Strangler_1963/The_Strangler_1963.mkv',
   'tt0032599': 'https://archive.org/download/His_Girl_Friday_1940/His_Girl_Friday_1940_512kb.mp4',
   'tt5363918': 'https://archive.org/download/NASA-Ultra-High-Definition/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov',
-  'tt2285752': 'http://trailers.divx.com/hevc/TearsOfSteel_4K_24fps_9500kbps_2aud_9subs.mkv'
+  'tt2285752': 'http://trailers.divx.com/hevc/TearsOfSteel_4K_24fps_9500kbps_2aud_9subs.mkv',
+  'tt4677012': 'https://archive.org/download/NASA-Ultra-High-Definition/Space-Station-Fisheye-Fly-Through-4K_Ultra-HD.mov'
 };
 
 // Manifest
@@ -131,6 +140,7 @@ console.log(`   - The Strangler (1964) - ID: tt0057569`);
 console.log(`   - His Girl Friday (1940) - ID: tt0032599`);
 console.log(`   - A Beautiful Planet (2016) - NASA 4K - ID: tt5363918`);
 console.log(`   - Tears of Steel (2012) - Blender 4K HEVC - ID: tt2285752`);
+console.log(`   - Journey to Space (2015) - NASA ISS Fisheye 4K - ID: tt4677012`);
 console.log(`\n💡 IMPORTANTE:`);
 console.log(`   1. DISINSTALLA l'addon vecchio da Stremio`);
 console.log(`   2. REINSTALLA usando: http://127.0.0.1:${PORT}/manifest.json`);
