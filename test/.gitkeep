@@ -1,0 +1,3 @@
+# Questa cartella contiene i file video HEVC per i test
+# I file video non sono inclusi nel repository (vedi .gitignore)
+# Aggiungi i tuoi file HEVC qui per testarli localmente

@@ -4,7 +4,9 @@
   "description": "Addon di test per riproduzione file HEVC (H.265) lunghi su TV Hisense / Vidaa / Home OS tramite Stremio",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "file-server": "node file-server.js",
+    "dev": "node file-server.js & node index.js"
   },
   "keywords": [
     "stremio",
