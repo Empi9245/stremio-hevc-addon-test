@@ -1,102 +1,107 @@
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk');
+const fs = require('fs');
+const path = require('path');
 
-// Metadata dei film di test - USA ID IMDB REALI
-const CATALOG = [
-  {
-    id: 'tt0057569',
-    type: 'movie',
-    name: 'The Strangler',
-    description: 'File HEVC locale - Test TV Hisense',
-    releaseInfo: '1964',
-    genres: ['Thriller', 'Test HEVC Locale']
-  },
-  {
-    id: 'tt0032599',
-    type: 'movie',
-    name: 'His Girl Friday',
-    description: 'File HEVC locale - Test TV Hisense',
-    releaseInfo: '1940',
-    genres: ['Comedy', 'Test HEVC Locale']
-  },
-  {
-    id: 'tt5363918',
-    type: 'movie',
-    name: 'A Beautiful Planet',
-    description: 'NASA 4K UHD locale - Test HEVC TV Hisense',
-    releaseInfo: '2016',
-    genres: ['Documentary', 'Test HEVC 4K Locale']
-  },
-  {
-    id: 'tt2285752',
-    type: 'movie',
-    name: 'Tears of Steel',
-    description: 'File 4K HEVC locale - Test TV Hisense',
-    releaseInfo: '2012',
-    genres: ['Short', 'Test HEVC 4K Locale']
-  },
-  {
-    id: 'tt4677012',
-    type: 'movie',
-    name: 'Journey to Space',
-    description: 'NASA ISS 4K UHD locale - Test HEVC TV Hisense',
-    releaseInfo: '2015',
-    genres: ['Documentary', 'Test HEVC 4K Locale']
-  }
-];
-
-// Stream URLs - FILE LOCALI dalla cartella test/
-// IMPORTANTE: Avvia file-server.js prima di usare l'addon!
-// Comando: node file-server.js
+// Configurazione
 const FILE_SERVER = process.env.FILE_SERVER || 'http://localhost:8080';
+const TEST_DIR = path.join(__dirname, 'test');
 
-const STREAMS = {
-  'tt0057569': `${FILE_SERVER}/The_Strangler_1963.mkv`,
-  'tt0032599': `${FILE_SERVER}/EBAF90DC-2309-4AC6-B2B9-200A09C3BF43.hevc.mp4`,
-  'tt5363918': `${FILE_SERVER}/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov`,
-  'tt2285752': `${FILE_SERVER}/tearsofsteel_4k.mov`,
-  'tt4677012': `${FILE_SERVER}/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov`
-};
+// Funzione per generare ID univoco dal nome file
+function generateId(filename) {
+  return 'hevc_' + filename.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+}
+
+// Funzione per leggere i file dalla cartella test/
+function getVideoFiles() {
+  if (!fs.existsSync(TEST_DIR)) {
+    console.log('⚠️  Cartella test/ non trovata');
+    return [];
+  }
+
+  const files = fs.readdirSync(TEST_DIR);
+  const videoExtensions = ['.mkv', '.mp4', '.mov', '.avi', '.webm'];
+  
+  return files.filter(file => {
+    const ext = path.extname(file).toLowerCase();
+    return videoExtensions.includes(ext);
+  });
+}
+
+// Genera catalogo dinamico dai file
+function generateCatalog() {
+  const videoFiles = getVideoFiles();
+  
+  return videoFiles.map(filename => {
+    const nameWithoutExt = path.basename(filename, path.extname(filename));
+    const stat = fs.statSync(path.join(TEST_DIR, filename));
+    const sizeMB = (stat.size / 1024 / 1024).toFixed(2);
+    
+    return {
+      id: generateId(filename),
+      type: 'movie',
+      name: nameWithoutExt.replace(/_/g, ' '),
+      description: `File HEVC locale - ${sizeMB} MB - Test TV Hisense`,
+      releaseInfo: new Date().getFullYear().toString(),
+      genres: ['Test HEVC', 'Locale']
+    };
+  });
+}
+
+// Genera streams dinamici dai file
+function generateStreams() {
+  const videoFiles = getVideoFiles();
+  const streams = {};
+  
+  videoFiles.forEach(filename => {
+    const id = generateId(filename);
+    streams[id] = `${FILE_SERVER}/${encodeURIComponent(filename)}`;
+  });
+  
+  return streams;
+}
 
 // Manifest
 const manifest = {
-  id: 'community.hevctest.hisense',
-  version: '1.1.0',
-  name: 'HEVC Test Hisense (Local)',
-  description: 'Addon di test per riproduzione HEVC su TV Hisense - File locali veloci',
-  logo: 'https://via.placeholder.com/256x256/8B5CF6/FFFFFF?text=HEVC+LOCAL',
-  background: 'https://via.placeholder.com/1920x1080/8B5CF6/FFFFFF?text=HEVC+Test+Local',
+  id: 'community.hevctest.hisense.local',
+  version: '2.0.0',
+  name: 'HEVC Test Local',
+  description: 'Addon dinamico per test HEVC - Legge file dalla cartella test/',
+  logo: 'https://via.placeholder.com/256x256/10B981/FFFFFF?text=HEVC+LOCAL',
+  background: 'https://via.placeholder.com/1920x1080/10B981/FFFFFF?text=HEVC+Local+Files',
   resources: ['catalog', 'meta', 'stream'],
   types: ['movie'],
   catalogs: [
     {
       type: 'movie',
-      id: 'hevc_test_catalog',
-      name: 'HEVC Test Movies (Local)'
+      id: 'hevc_local_catalog',
+      name: 'HEVC Local Files'
     }
   ]
 };
 
 const builder = new addonBuilder(manifest);
 
-// Catalog handler
+// Catalog handler - DINAMICO
 builder.defineCatalogHandler(({ type, id }) => {
   console.log('📚 Catalog request:', type, id);
   
-  if (type === 'movie' && id === 'hevc_test_catalog') {
-    console.log(`✅ Returning ${CATALOG.length} movies`);
-    return Promise.resolve({ metas: CATALOG });
+  if (type === 'movie' && id === 'hevc_local_catalog') {
+    const catalog = generateCatalog();
+    console.log(`✅ Returning ${catalog.length} files from test/ folder`);
+    return Promise.resolve({ metas: catalog });
   }
   
   console.log('❌ Catalog not found');
   return Promise.resolve({ metas: [] });
 });
 
-// Meta handler
+// Meta handler - DINAMICO
 builder.defineMetaHandler(({ type, id }) => {
   console.log('📋 Meta request:', type, id);
   
   if (type === 'movie') {
-    const meta = CATALOG.find(m => m.id === id);
+    const catalog = generateCatalog();
+    const meta = catalog.find(m => m.id === id);
     if (meta) {
       console.log(`✅ Found meta for ${id}`);
       return Promise.resolve({ meta });
@@ -107,24 +112,25 @@ builder.defineMetaHandler(({ type, id }) => {
   return Promise.resolve({ meta: null });
 });
 
-// Stream handler
+// Stream handler - DINAMICO
 builder.defineStreamHandler(({ type, id }) => {
   console.log('🎬 Stream request:', type, id);
   
   if (type === 'movie') {
-    const url = STREAMS[id];
+    const streams = generateStreams();
+    const url = streams[id];
+    
     if (url) {
       console.log(`✅ Found stream for ${id}: ${url}`);
       return Promise.resolve({
         streams: [
           {
-            name: 'HEVC Test',
-            title: 'Test Stream',
+            name: 'HEVC Local',
+            title: 'Local File',
             url: url,
             behaviorHints: {
               notWebReady: true,
-              bingeGroup: 'hevc-test-hisense',
-              countryWhitelist: ['IT', 'US', 'GB', 'DE', 'FR', 'ES']
+              bingeGroup: 'hevc-local'
             }
           }
         ]
@@ -140,21 +146,26 @@ builder.defineStreamHandler(({ type, id }) => {
 const PORT = process.env.PORT || 7000;
 serveHTTP(builder.getInterface(), { port: PORT });
 
-console.log(`\n✅ Addon running at http://127.0.0.1:${PORT}/manifest.json`);
-console.log(`\n📋 Test URLs:`);
-console.log(`   Manifest: http://127.0.0.1:${PORT}/manifest.json`);
-console.log(`   Catalog:  http://127.0.0.1:${PORT}/catalog/movie/hevc_test_catalog.json`);
-console.log(`   Meta:     http://127.0.0.1:${PORT}/meta/movie/tt0057569.json`);
-console.log(`   Stream:   http://127.0.0.1:${PORT}/stream/movie/tt0057569.json`);
-console.log(`\n🎬 Film disponibili (FILE LOCALI):`);
-console.log(`   - The Strangler (1964) - test/The_Strangler_1963.mkv`);
-console.log(`   - His Girl Friday (1940) - test/EBAF90DC-2309-4AC6-B2B9-200A09C3BF43.hevc.mp4`);
-console.log(`   - A Beautiful Planet (2016) - test/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov`);
-console.log(`   - Tears of Steel (2012) - test/tearsofsteel_4k.mov`);
-console.log(`   - Journey to Space (2015) - test/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov`);
-console.log(`\n💡 IMPORTANTE:`);
-console.log(`   1. AVVIA IL FILE SERVER: node file-server.js`);
-console.log(`   2. DISINSTALLA l'addon vecchio da Stremio`);
-console.log(`   3. REINSTALLA usando: http://127.0.0.1:${PORT}/manifest.json`);
-console.log(`   4. Vai su Board → Cerca "HEVC Test Movies"`);
-console.log(`   5. I file sono serviti dalla cartella test/ (VELOCE!)\n`);
+// Log startup info
+const videoFiles = getVideoFiles();
+console.log(`\n✅ HEVC Local Addon running at http://127.0.0.1:${PORT}/manifest.json`);
+console.log(`\n📁 Cartella test: ${TEST_DIR}`);
+console.log(`📹 File trovati: ${videoFiles.length}\n`);
+
+if (videoFiles.length === 0) {
+  console.log('⚠️  NESSUN FILE VIDEO TROVATO!');
+  console.log('   Aggiungi file .mkv, .mp4, .mov nella cartella test/\n');
+} else {
+  console.log('🎬 File disponibili:');
+  videoFiles.forEach(file => {
+    const stat = fs.statSync(path.join(TEST_DIR, file));
+    const sizeMB = (stat.size / 1024 / 1024).toFixed(2);
+    console.log(`   ✓ ${file} (${sizeMB} MB)`);
+  });
+  console.log();
+}
+
+console.log('💡 COME USARE:');
+console.log('   1. AVVIA FILE SERVER: node file-server.js');
+console.log('   2. INSTALLA ADDON: http://127.0.0.1:${PORT}/manifest.json');
+console.log('   3. Vai su Board → "HEVC Local Files"\n');
