@@ -1,134 +1,88 @@
-# Stremio HEVC Test Addon
+# Test HEVC Hisense Addon per Stremio
 
-Addon di test per riproduzione file HEVC (H.265) su TV Hisense tramite Stremio.
+Addon Stremio per testare la riproduzione di file HEVC (H.265) su TV Hisense.
 
-## Caratteristiche
+## 🚀 Quick Start
 
-- ✅ Streaming di file HEVC locali (velocissimo!)
-- ✅ Supporto per file 4K UHD
-- ✅ Server HTTP con Range requests per streaming fluido
-- ✅ Catalogo personalizzabile con ID IMDB reali
-- ✅ Logo personalizzato durante il caricamento
-
-## Installazione
-
+### 1. Installa dipendenze
 ```bash
 npm install
 ```
 
-## Utilizzo
+### 2. Avvia i server
 
-### 1. Aggiungi i tuoi file HEVC
-
-Metti i file video nella cartella `test/`:
-
-```
-test/
-├── film1.mkv
-├── film2.mp4
-└── film3.mov
-```
-
-### 2. Avvia il file server
-
-In un terminale:
-
+**Opzione A - Due terminali separati (consigliato per debug):**
 ```bash
-node file-server.js
-```
+# Terminale 1 - File Server
+npm run file-server
 
-Il server servirà i file su `http://localhost:8080/`
-
-### 3. Avvia l'addon Stremio
-
-In un altro terminale:
-
-```bash
+# Terminale 2 - Addon Stremio
 npm start
 ```
 
-L'addon sarà disponibile su `http://localhost:7000/manifest.json`
-
-**Oppure avvia entrambi insieme:**
-
+**Opzione B - Un solo comando:**
 ```bash
 npm run dev
 ```
 
-### 4. Aggiungi l'addon a Stremio
+### 3. Testa l'addon
+```bash
+npm test
+```
+
+Questo script verifica:
+- ✅ Manifest accessibile
+- ✅ Catalogo con i file dalla cartella test/
+- ✅ Stream URLs corretti
+- ✅ File server funzionante
+
+### 4. Installa su Stremio
 
 1. Apri Stremio
-2. Vai su **Addons** → **Community Addons**
-3. Inserisci: `http://localhost:7000/manifest.json`
-4. Clicca **Install**
-5. Vai su **Board** → Vedrai "HEVC Test Movies (Local)"
+2. Clicca sull'icona puzzle (addon) in alto a destra
+3. Nella barra in alto a sinistra, inserisci:
+   ```
+   http://127.0.0.1:7000/manifest.json
+   ```
+4. Premi Invio
+5. Vai su **Board** → Cerca il catalogo **"HEVC Local Files"**
+6. Clicca su un film per riprodurlo
 
-## Configurazione
-
-### Modificare i file di test
-
-Modifica il file `index.js` nella sezione `STREAMS`:
-
-```javascript
-const STREAMS = {
-  'tt0057569': `${FILE_SERVER}/tuo-file.mkv`,
-  // Aggiungi altri file...
-};
-```
-
-E aggiungi i corrispondenti metadata in `CATALOG`.
-
-### Cambiare porta
-
-**File server:**
-```bash
-FILE_PORT=9000 node file-server.js
-```
-
-**Addon:**
-```bash
-PORT=8000 npm start
-```
-
-## Deploy su Render (per accesso remoto)
-
-1. Crea un repository GitHub
-2. Pusha il codice (i file video non saranno inclusi)
-3. Vai su [Render](https://render.com)
-4. Crea un nuovo Web Service
-5. Connetti il repository
-6. Render farà automaticamente il deploy
-
-**Nota:** Per il deploy remoto, dovrai usare URL pubblici per i file video (es. Archive.org) invece dei file locali.
-
-## Struttura del Progetto
+## 📁 Struttura File
 
 ```
-stremio-hevc-addon/
-├── index.js           # Addon Stremio principale
-├── file-server.js     # Server HTTP per file locali
-├── package.json       # Configurazione npm
-├── render.yaml        # Configurazione Render
-├── test/              # Cartella per file video HEVC
-│   └── .gitkeep
-└── README.md
+test/
+├── The_Strangler_1963.mkv
+├── EBAF90DC-2309-4AC6-B2B9-200A09C3BF43.hevc.mp4
+├── tearsofsteel_4k.mov
+└── Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov
 ```
 
-## Troubleshooting
+L'addon legge **dinamicamente** tutti i file video dalla cartella `test/`.
 
-**Il catalogo è vuoto:**
-- Disinstalla e reinstalla l'addon su Stremio
-- Verifica che entrambi i server siano avviati
+## 🔧 Troubleshooting
 
-**Stream non si carica:**
-- Verifica che il file-server sia in esecuzione
-- Controlla che i file siano nella cartella `test/`
-- Verifica i nomi dei file in `index.js`
+### Il catalogo non appare su Stremio
+1. Verifica che entrambi i server siano in esecuzione
+2. Controlla i log per errori
+3. Testa manualmente: `http://localhost:7000/catalog/movie/hevc_local_catalog.json`
 
-**Lento su TV:**
-- Assicurati che TV e PC siano sulla stessa rete WiFi
-- Usa cavo ethernet per connessione più stabile
+### Gli stream non partono
+1. Verifica che il file server sia in esecuzione su porta 8080
+2. Testa manualmente: `http://localhost:8080/The_Strangler_1963.mkv`
+3. Controlla i log del file server
 
-## License
+### Test automatico fallisce
+1. Assicurati che entrambi i server siano avviati
+2. Verifica che le porte 7000 e 8080 siano libere
+3. Controlla che ci siano file video nella cartella test/
 
-MIT
+## 🌐 Deploy su Render
+
+Per il deploy remoto, modifica la variabile `FILE_SERVER` in `index.js` con l'URL pubblico del tuo file server.
+
+## 📝 Note
+
+- Supporta: `.mkv`, `.mp4`, `.mov`, `.avi`, `.webm`
+- Il file server supporta Range requests per streaming efficiente
+- CORS abilitato per compatibilità con Stremio

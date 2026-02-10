@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "file-server": "node file-server.js",
-    "dev": "node file-server.js & node index.js"
+    "dev": "node file-server.js & node index.js",
+    "test": "node test-addon.js"
   },
   "keywords": [
     "stremio",

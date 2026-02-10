@@ -18,10 +18,16 @@ const server = http.createServer((req, res) => {
   }
 
   // Decodifica URL e rimuovi query string
-  const urlPath = decodeURIComponent(req.url.split('?')[0]);
+  let urlPath = decodeURIComponent(req.url.split('?')[0]);
+  // Rimuovi lo slash iniziale se presente
+  if (urlPath.startsWith('/')) {
+    urlPath = urlPath.substring(1);
+  }
   const filePath = path.join(TEST_DIR, urlPath);
 
-  console.log(`📁 Request: ${urlPath}`);
+  console.log(`📁 Request: ${req.url}`);
+  console.log(`   Decoded path: ${urlPath}`);
+  console.log(`   Full file path: ${filePath}`);
 
   // Verifica che il file sia nella directory test
   if (!filePath.startsWith(TEST_DIR)) {

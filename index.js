@@ -40,6 +40,7 @@ function generateCatalog() {
       id: generateId(filename),
       type: 'movie',
       name: nameWithoutExt.replace(/_/g, ' '),
+      poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=HEVC',
       description: `File HEVC locale - ${sizeMB} MB - Test TV Hisense`,
       releaseInfo: new Date().getFullYear().toString(),
       genres: ['Test HEVC', 'Locale']
@@ -54,7 +55,9 @@ function generateStreams() {
   
   videoFiles.forEach(filename => {
     const id = generateId(filename);
-    streams[id] = `${FILE_SERVER}/${encodeURIComponent(filename)}`;
+    // Fix: assicurati che l'URL sia corretto con lo slash
+    const encodedFilename = encodeURIComponent(filename);
+    streams[id] = `${FILE_SERVER}/${encodedFilename}`;
   });
   
   return streams;
