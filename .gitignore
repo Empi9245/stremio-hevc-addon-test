@@ -2,8 +2,6 @@ node_modules/
 npm-debug.log
 .env
 .DS_Store
-test/*.mkv
-test/*.mp4
-test/*.mov
-test/*.avi
-test/*.webm
+# Escludi solo i file video GRANDI (oltre 100 MB)
+test/tearsofsteel_4k.mov
+test/Zero-G-Hail-Mary-Pass_UHD_CLEAN-FOR-NEWS_HIGH-RES.mov

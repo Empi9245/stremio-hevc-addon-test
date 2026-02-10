@@ -6,6 +6,54 @@ const path = require('path');
 const FILE_SERVER = process.env.FILE_SERVER || 'http://localhost:8080';
 const TEST_DIR = path.join(__dirname, 'test');
 
+// Catalogo statico con file di test HEVC pubblici (Jellyfin)
+const STATIC_CATALOG = [
+  {
+    id: 'hevc_jellyfin_1080p_10bit_10m',
+    type: 'movie',
+    name: 'Test HEVC 1080p 10bit 10Mbps',
+    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=1080p+10bit',
+    description: 'File di test HEVC 1080p 10-bit - 10 Mbps - 36 MB',
+    releaseInfo: '2024',
+    genres: ['Test HEVC', 'Jellyfin']
+  },
+  {
+    id: 'hevc_jellyfin_1080p_10bit_20m',
+    type: 'movie',
+    name: 'Test HEVC 1080p 10bit 20Mbps',
+    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=1080p+20Mbps',
+    description: 'File di test HEVC 1080p 10-bit - 20 Mbps - 71 MB',
+    releaseInfo: '2024',
+    genres: ['Test HEVC', 'Jellyfin']
+  },
+  {
+    id: 'hevc_jellyfin_4k_10bit_40m',
+    type: 'movie',
+    name: 'Test HEVC 4K 10bit 40Mbps',
+    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=4K+40Mbps',
+    description: 'File di test HEVC 4K 10-bit - 40 Mbps - 141 MB',
+    releaseInfo: '2024',
+    genres: ['Test HEVC', 'Jellyfin', '4K']
+  },
+  {
+    id: 'hevc_jellyfin_4k_10bit_60m',
+    type: 'movie',
+    name: 'Test HEVC 4K 10bit 60Mbps',
+    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=4K+60Mbps',
+    description: 'File di test HEVC 4K 10-bit - 60 Mbps - 211 MB',
+    releaseInfo: '2024',
+    genres: ['Test HEVC', 'Jellyfin', '4K']
+  }
+];
+
+// Stream URLs statici (Jellyfin repository)
+const STATIC_STREAMS = {
+  'hevc_jellyfin_1080p_10bit_10m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%201080p%20HEVC%2010bit%2010M.mp4',
+  'hevc_jellyfin_1080p_10bit_20m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%201080p%20HEVC%2010bit%2020M.mp4',
+  'hevc_jellyfin_4k_10bit_40m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%204K%20HEVC%2010bit%2040M.mp4',
+  'hevc_jellyfin_4k_10bit_60m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%204K%20HEVC%2010bit%2060M.mp4'
+};
+
 // Funzione per generare ID univoco dal nome file
 function generateId(filename) {
   return 'hevc_' + filename.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
@@ -31,6 +79,12 @@ function getVideoFiles() {
 function generateCatalog() {
   const videoFiles = getVideoFiles();
   
+  // Se non ci sono file locali (es. su Render), usa il catalogo statico Jellyfin
+  if (videoFiles.length === 0) {
+    console.log('⚠️  Nessun file locale trovato, uso catalogo statico Jellyfin');
+    return STATIC_CATALOG;
+  }
+  
   return videoFiles.map(filename => {
     const nameWithoutExt = path.basename(filename, path.extname(filename));
     const stat = fs.statSync(path.join(TEST_DIR, filename));
@@ -51,11 +105,17 @@ function generateCatalog() {
 // Genera streams dinamici dai file
 function generateStreams() {
   const videoFiles = getVideoFiles();
+  
+  // Se non ci sono file locali (es. su Render), usa gli stream statici Jellyfin
+  if (videoFiles.length === 0) {
+    console.log('⚠️  Nessun file locale trovato, uso stream statici Jellyfin');
+    return STATIC_STREAMS;
+  }
+  
   const streams = {};
   
   videoFiles.forEach(filename => {
     const id = generateId(filename);
-    // Fix: assicurati che l'URL sia corretto con lo slash
     const encodedFilename = encodeURIComponent(filename);
     streams[id] = `${FILE_SERVER}/${encodedFilename}`;
   });
