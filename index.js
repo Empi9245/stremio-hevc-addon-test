@@ -6,52 +6,52 @@ const path = require('path');
 const FILE_SERVER = process.env.FILE_SERVER || 'http://localhost:8080';
 const TEST_DIR = path.join(__dirname, 'test');
 
-// Catalogo statico con file di test HEVC pubblici (Jellyfin) - FILE PESANTI
+// Catalogo statico con file di test HEVC pubblici (Jellyfish) - FILE PESANTI ESTREMI
 const STATIC_CATALOG = [
   {
-    id: 'hevc_jellyfin_4k_10bit_80m',
+    id: 'jellyfish_140_mbps_4k_uhd_hevc_10bit',
     type: 'movie',
-    name: 'Test HEVC 4K 10bit 80Mbps',
-    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=4K+80Mbps',
-    description: 'File di test HEVC 4K 10-bit - 80 Mbps - 282 MB',
+    name: 'Jellyfish 4K UHD HEVC 10bit 140Mbps',
+    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=140+Mbps',
+    description: 'Test HEVC 4K UHD 10-bit - 140 Mbps - 512 MB',
     releaseInfo: '2024',
-    genres: ['Test HEVC', 'Jellyfin', '4K UHD']
+    genres: ['Test HEVC', 'Jellyfish', '4K UHD']
   },
   {
-    id: 'hevc_jellyfin_4k_10bit_100m',
+    id: 'jellyfish_180_mbps_4k_uhd_hevc_10bit',
     type: 'movie',
-    name: 'Test HEVC 4K 10bit 100Mbps',
-    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=4K+100Mbps',
-    description: 'File di test HEVC 4K 10-bit - 100 Mbps - 352 MB',
+    name: 'Jellyfish 4K UHD HEVC 10bit 180Mbps',
+    poster: 'https://via.placeholder.com/300x450/FFA500/FFFFFF?text=180+Mbps',
+    description: 'Test HEVC 4K UHD 10-bit - 180 Mbps - 658 MB',
     releaseInfo: '2024',
-    genres: ['Test HEVC', 'Jellyfin', '4K UHD']
+    genres: ['Test HEVC', 'Jellyfish', '4K UHD']
   },
   {
-    id: 'hevc_jellyfin_4k_10bit_150m',
+    id: 'jellyfish_250_mbps_4k_uhd_hevc_10bit',
     type: 'movie',
-    name: 'Test HEVC 4K 10bit 150Mbps',
-    poster: 'https://via.placeholder.com/300x450/10B981/FFFFFF?text=4K+150Mbps',
-    description: 'File di test HEVC 4K 10-bit - 150 Mbps - 528 MB',
+    name: 'Jellyfish 4K UHD HEVC 10bit 250Mbps',
+    poster: 'https://via.placeholder.com/300x450/FF6B6B/FFFFFF?text=250+Mbps',
+    description: 'Test HEVC 4K UHD 10-bit - 250 Mbps - 914 MB',
     releaseInfo: '2024',
-    genres: ['Test HEVC', 'Jellyfin', '4K UHD']
+    genres: ['Test HEVC', 'Jellyfish', '4K UHD', 'Extreme']
   },
   {
-    id: 'hevc_jellyfin_8k_10bit_150m',
+    id: 'jellyfish_400_mbps_4k_uhd_hevc_10bit',
     type: 'movie',
-    name: 'Test HEVC 8K 10bit 150Mbps',
-    poster: 'https://via.placeholder.com/300x450/FF6B6B/FFFFFF?text=8K+150Mbps',
-    description: 'File di test HEVC 8K 10-bit - 150 Mbps - 528 MB - STRESS TEST',
+    name: 'Jellyfish 4K UHD HEVC 10bit 400Mbps',
+    poster: 'https://via.placeholder.com/300x450/DC143C/FFFFFF?text=400+Mbps',
+    description: 'Test HEVC 4K UHD 10-bit - 400 Mbps - 1.4 GB - STRESS TEST ESTREMO',
     releaseInfo: '2024',
-    genres: ['Test HEVC', 'Jellyfin', '8K UHD', 'Extreme']
+    genres: ['Test HEVC', 'Jellyfish', '4K UHD', 'Extreme']
   }
 ];
 
-// Stream URLs statici (Jellyfin repository) - FILE PESANTI
+// Stream URLs statici (Jellyfish repository mirror)
 const STATIC_STREAMS = {
-  'hevc_jellyfin_4k_10bit_80m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%204K%20HEVC%2010bit%2080M.mp4',
-  'hevc_jellyfin_4k_10bit_100m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%204K%20HEVC%2010bit%20100M.mp4',
-  'hevc_jellyfin_4k_10bit_150m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%204K%20HEVC%2010bit%20150M.mp4',
-  'hevc_jellyfin_8k_10bit_150m': 'https://repo.jellyfin.org/test-videos/sdr/Test%20Jellyfin%208K%20HEVC%2010bit%20150M.mp4'
+  'jellyfish_140_mbps_4k_uhd_hevc_10bit': 'https://repo.jellyfin.org/jellyfish/media/jellyfish-140-mbps-4k-uhd-hevc-10bit.mkv',
+  'jellyfish_180_mbps_4k_uhd_hevc_10bit': 'https://repo.jellyfin.org/jellyfish/media/jellyfish-180-mbps-4k-uhd-hevc-10bit.mkv',
+  'jellyfish_250_mbps_4k_uhd_hevc_10bit': 'https://repo.jellyfin.org/jellyfish/media/jellyfish-250-mbps-4k-uhd-hevc-10bit.mkv',
+  'jellyfish_400_mbps_4k_uhd_hevc_10bit': 'https://repo.jellyfin.org/jellyfish/media/jellyfish-400-mbps-4k-uhd-hevc-10bit.mkv'
 };
 
 // Funzione per generare ID univoco dal nome file
